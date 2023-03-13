@@ -1,8 +1,38 @@
 import { useState } from 'react'
 import { ethers } from "ethers"
 import { Row, Form, Button } from 'react-bootstrap'
-import { create as ipfsHttpClient } from 'ipfs-http-client'
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+// import { create as ipfsHttpClient } from 'ipfs-http-client'
+import { Buffer } from 'buffer';
+// const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+// const ipfsClient = require('ipfs-http-client');
+
+// const projectId = '2MwjpMEF9FJWkPELt3LVLget1Wd'; 
+// const projectSecret = 'e92f7ed8720080934b11b7a58366c599'; 
+// const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+
+// const client = ipfsHttpClient({
+//     host: 'https://ipfs.infura.io',
+//     port: 5001,
+//     protocol: 'https',
+//     headers: {
+//         authorization: auth,
+//     },
+// });
+
+const ipfsClient = require('ipfs-http-client');
+
+const projectId = '2MwjpMEF9FJWkPELt3LVLget1Wd';
+const projectSecret = 'e92f7ed8720080934b11b7a58366c599';
+const auth ='Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+
+const client = ipfsClient.create({
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  headers: {
+    authorization: auth,
+  },
+});
 
 const Create = ({ marketplace, nft }) => {
   const [image, setImage] = useState('')
@@ -12,12 +42,15 @@ const Create = ({ marketplace, nft }) => {
   const uploadToIPFS = async (event) => {
     event.preventDefault()
     const file = event.target.files[0]
+    console.log(file);
     if (typeof file !== 'undefined') {
+      // const result = await client.add(file)
       try {
         const result = await client.add(file)
-        console.log(result)
-        setImage(`https://ipfs.infura.io/ipfs/${result.path}`)
+        console.log('hh'+ result)
+        setImage(`https://nftmarketplacemajor.infura-ipfs.io/ipfs/${result.path}`)
       } catch (error){
+        // console.log('hh'+ result)
         console.log("ipfs image upload error: ", error)
       }
     }
@@ -32,7 +65,7 @@ const Create = ({ marketplace, nft }) => {
     }
   }
   const mintThenList = async (result) => {
-    const uri = `https://ipfs.infura.io/ipfs/${result.path}`
+    const uri = `https://nftmarketplacemajor.infura-ipfs.io/ipfs/${result.path}`
     // mint nft 
     await(await nft.mint(uri)).wait()
     // get tokenId of new nft 
